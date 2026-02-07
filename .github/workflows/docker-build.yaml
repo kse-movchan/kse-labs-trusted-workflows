@@ -77,7 +77,7 @@ jobs:
             FULL_TAGS="$FULL_TAGS$REGISTRY/$REPO/$IMAGE:$tag"
           done
 
-          echo "tags=$FULL_TAGS" >> $GITHUB_OUTPUT
+          echo "tags=$FULL_TAGS" >> "$GITHUB_OUTPUT"
           echo "Generated tags: $FULL_TAGS"
 
       - name: Build and push Docker image

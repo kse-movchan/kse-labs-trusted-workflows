@@ -82,7 +82,7 @@ jobs:
         run: |
           OWNER=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
           IMAGE=$(echo "${{ inputs.image-name }}" | tr '[:upper:]' '[:lower:]')
-          echo "image=${{ inputs.registry }}/${OWNER}/${IMAGE}" >> $GITHUB_OUTPUT
+          echo "image=${{ inputs.registry }}/${OWNER}/${IMAGE}" >> "$GITHUB_OUTPUT"
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
