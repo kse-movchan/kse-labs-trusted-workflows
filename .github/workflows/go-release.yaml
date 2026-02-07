@@ -8,10 +8,6 @@ on:
         required: false
         type: string
         default: '1.21'
-      working-directory:
-        description: 'Directory containing Go code'
-        required: true
-        type: string
       binary-name:
         description: 'Name of the binary'
         required: false
@@ -39,7 +35,7 @@ on:
 
 jobs:
   release:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     steps:
       - uses: actions/checkout@v4
         with:
@@ -52,7 +48,6 @@ jobs:
           goos: ${{ inputs.goos }}
           goarch: ${{ inputs.goarch }}
           goversion: ${{ inputs.go-version }}
-          project_path: ${{ inputs.working-directory }}
           binary_name: ${{ inputs.binary-name }}
           release_tag: ${{ inputs.release-tag }}
           md5sum: false

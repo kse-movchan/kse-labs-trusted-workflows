@@ -8,10 +8,6 @@ on:
         required: false
         type: string
         default: '1.21'
-      working-directory:
-        description: 'Directory containing Go code'
-        required: true
-        type: string
       binary-name:
         description: 'Name of the binary'
         required: true
@@ -45,14 +41,12 @@ jobs:
           go-version: ${{ inputs.go-version }}
 
       - name: Build binary
-        working-directory: ${{ inputs.working-directory }}
         run: |
           CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o ${{ inputs.binary-name }} .
           echo "Built binary: ${{ inputs.binary-name }}"
           ls -la ${{ inputs.binary-name }}
 
       - name: Create release archive
-        working-directory: ${{ inputs.working-directory }}
         run: |
           tar -czvf ${{ inputs.binary-name }}-${{ inputs.release-tag }}-linux-amd64.tar.gz ${{ inputs.binary-name }}
           sha256sum ${{ inputs.binary-name }}-${{ inputs.release-tag }}-linux-amd64.tar.gz > ${{ inputs.binary-name }}-${{ inputs.release-tag }}-linux-amd64.tar.gz.sha256
@@ -60,7 +54,6 @@ jobs:
       - name: Upload to GitHub Release
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        working-directory: ${{ inputs.working-directory }}
         run: |
           gh release upload ${{ inputs.release-tag }} \
             ${{ inputs.binary-name }}-${{ inputs.release-tag }}-linux-amd64.tar.gz \
@@ -87,8 +80,8 @@ jobs:
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
         with:
-          context: ${{ inputs.working-directory }}
-          file: ${{ inputs.working-directory }}/Dockerfile
+          context: .
+          file: ./Dockerfile
           push: true
           tags: |
             ${{ steps.tags.outputs.image }}:${{ inputs.release-tag }}
