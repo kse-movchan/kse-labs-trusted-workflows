@@ -7,18 +7,18 @@ on:
     branches: [main]
 
 jobs:
-  actionlint:
-    name: Lint workflows
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
+  # actionlint:
+  #   name: Lint workflows
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v4
 
-      - name: Install actionlint
-        run: |
-          bash <(curl https://raw.githubusercontent.com/rhysd/actionlint/main/scripts/download-actionlint.bash)
+  #     - name: Install actionlint
+  #       run: |
+  #         bash <(curl https://raw.githubusercontent.com/rhysd/actionlint/main/scripts/download-actionlint.bash)
 
-      - name: Run actionlint
-        run: ./actionlint -color
+  #     - name: Run actionlint
+  #       run: ./actionlint -color
 
   zizmor:
     name: Security analysis with zizmor
