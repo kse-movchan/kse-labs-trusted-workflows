@@ -1,0 +1,92 @@
+name: Docker Build
+
+on:
+  workflow_call:
+    inputs:
+      context:
+        description: 'Docker build context path'
+        required: false
+        type: string
+        default: '.'
+      dockerfile:
+        description: 'Path to Dockerfile'
+        required: false
+        type: string
+        default: 'Dockerfile'
+      image-name:
+        description: 'Image name (without registry)'
+        required: true
+        type: string
+      tags:
+        description: 'Image tags (comma-separated)'
+        required: false
+        type: string
+        default: 'latest'
+      push:
+        description: 'Push image to registry'
+        required: false
+        type: boolean
+        default: false
+      registry:
+        description: 'Container registry (ghcr.io, docker.io)'
+        required: false
+        type: string
+        default: 'ghcr.io'
+      platforms:
+        description: 'Target platforms (comma-separated)'
+        required: false
+        type: string
+        default: 'linux/amd64'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to Container Registry
+        if: ${{ inputs.push }}
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ inputs.registry }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Generate image metadata
+        id: meta
+        run: |
+          REGISTRY="${{ inputs.registry }}"
+          REPO="${{ github.repository_owner }}"
+          IMAGE="${{ inputs.image-name }}"
+          TAGS="${{ inputs.tags }}"
+
+          # Build full image references
+          FULL_TAGS=""
+          IFS=',' read -ra TAG_ARRAY <<< "$TAGS"
+          for tag in "${TAG_ARRAY[@]}"; do
+            tag=$(echo "$tag" | xargs)  # trim whitespace
+            if [ -n "$FULL_TAGS" ]; then
+              FULL_TAGS="$FULL_TAGS,"
+            fi
+            FULL_TAGS="$FULL_TAGS$REGISTRY/$REPO/$IMAGE:$tag"
+          done
+
+          echo "tags=$FULL_TAGS" >> $GITHUB_OUTPUT
+          echo "Generated tags: $FULL_TAGS"
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: ${{ inputs.context }}
+          file: ${{ inputs.context }}/${{ inputs.dockerfile }}
+          platforms: ${{ inputs.platforms }}
+          push: ${{ inputs.push }}
+          tags: ${{ steps.meta.outputs.tags }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max

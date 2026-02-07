@@ -1,0 +1,59 @@
+name: Go Release
+
+on:
+  workflow_call:
+    inputs:
+      go-version:
+        description: 'Go version to use'
+        required: false
+        type: string
+        default: '1.21'
+      working-directory:
+        description: 'Directory containing Go code'
+        required: true
+        type: string
+      binary-name:
+        description: 'Name of the binary'
+        required: false
+        type: string
+        default: 'app'
+      goos:
+        description: 'Target OS (linux, darwin, windows)'
+        required: false
+        type: string
+        default: 'linux'
+      goarch:
+        description: 'Target architecture (amd64, arm64)'
+        required: false
+        type: string
+        default: 'amd64'
+      ref:
+        description: 'Git ref to checkout (tag, branch, SHA)'
+        required: false
+        type: string
+        default: ''
+      release-tag:
+        description: 'Release tag for uploading assets'
+        required: true
+        type: string
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.ref || github.ref }}
+
+      - name: Build and upload release
+        uses: wangyoucao577/go-release-action@v1
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          goos: ${{ inputs.goos }}
+          goarch: ${{ inputs.goarch }}
+          goversion: ${{ inputs.go-version }}
+          project_path: ${{ inputs.working-directory }}
+          binary_name: ${{ inputs.binary-name }}
+          release_tag: ${{ inputs.release-tag }}
+          md5sum: false
+          sha256sum: true
