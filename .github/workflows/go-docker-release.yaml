@@ -33,6 +33,10 @@ jobs:
       contents: write
       packages: write
     steps:
+      - name: Setup Git Bash
+        shell: pwsh
+        run: echo "C:\Program Files\Git\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+
       - uses: actions/checkout@v4
 
       - name: Set up Go
@@ -41,17 +45,20 @@ jobs:
           go-version: ${{ inputs.go-version }}
 
       - name: Build binary
+        shell: bash
         run: |
           CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o ${{ inputs.binary-name }} .
           echo "Built binary: ${{ inputs.binary-name }}"
           ls -la ${{ inputs.binary-name }}
 
       - name: Create release archive
+        shell: bash
         run: |
           tar -czvf ${{ inputs.binary-name }}-${{ inputs.release-tag }}-linux-amd64.tar.gz ${{ inputs.binary-name }}
           sha256sum ${{ inputs.binary-name }}-${{ inputs.release-tag }}-linux-amd64.tar.gz > ${{ inputs.binary-name }}-${{ inputs.release-tag }}-linux-amd64.tar.gz.sha256
 
       - name: Upload to GitHub Release
+        shell: bash
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
@@ -72,6 +79,7 @@ jobs:
 
       - name: Generate image tags
         id: tags
+        shell: bash
         run: |
           OWNER=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
           IMAGE=$(echo "${{ inputs.image-name }}" | tr '[:upper:]' '[:lower:]')
