@@ -58,14 +58,12 @@ jobs:
           sha256sum ${{ inputs.binary-name }}-${{ inputs.release-tag }}-linux-amd64.tar.gz > ${{ inputs.binary-name }}-${{ inputs.release-tag }}-linux-amd64.tar.gz.sha256
 
       - name: Upload to GitHub Release
-        shell: bash
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          gh release upload ${{ inputs.release-tag }} \
-            ${{ inputs.binary-name }}-${{ inputs.release-tag }}-linux-amd64.tar.gz \
-            ${{ inputs.binary-name }}-${{ inputs.release-tag }}-linux-amd64.tar.gz.sha256 \
-            --clobber
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ inputs.release-tag }}
+          files: |
+            ${{ inputs.binary-name }}-${{ inputs.release-tag }}-linux-amd64.tar.gz
+            ${{ inputs.binary-name }}-${{ inputs.release-tag }}-linux-amd64.tar.gz.sha256
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
