@@ -10,7 +10,36 @@ on:
         default: '1.21'
 
 jobs:
+  lint:
+    name: Lint
+    runs-on: self-hosted
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: ${{ inputs.go-version }}
+          cache: false
+
+      - name: Clean Go module cache
+        shell: bash
+        run: go clean -modcache
+
+      - name: Download dependencies
+        shell: bash
+        run: go mod download
+
+      - name: Verify dependencies
+        shell: bash
+        run: go mod verify
+
+      - name: Run go vet
+        shell: bash
+        run: go vet ./...
+
   build:
+    name: Build
     runs-on: self-hosted
     steps:
       - uses: actions/checkout@v4
@@ -29,6 +58,22 @@ jobs:
         shell: bash
         run: go build -v ./...
 
-      - name: Test
+  test:
+    name: Test
+    runs-on: self-hosted
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: ${{ inputs.go-version }}
+          cache: false
+
+      - name: Clean Go module cache
         shell: bash
-        run: go test -v ./...
+        run: go clean -modcache
+
+      - name: Run tests
+        shell: bash
+        run: go test -v -race -count=1 ./...
