@@ -101,5 +101,3 @@ jobs:
             ${{ steps.tags.outputs.image }}:latest
           build-args: |
             BINARY_PATH=${{ inputs.binary-name }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
