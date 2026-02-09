@@ -25,11 +25,6 @@ on:
         required: false
         type: string
         default: 'ghcr.io'
-      goos:
-        description: 'Target OS (linux, darwin, windows)'
-        required: false
-        type: string
-        default: 'linux'
       goarch:
         description: 'Target architecture (amd64, arm64)'
         required: false
@@ -53,23 +48,23 @@ jobs:
       - name: Build binary
         shell: bash
         run: |
-          CGO_ENABLED=0 GOOS=${{ inputs.goos }} GOARCH=${{ inputs.goarch }} go build -o ${{ inputs.binary-name }} .
+          CGO_ENABLED=0 GOOS=linux GOARCH=${{ inputs.goarch }} go build -o ${{ inputs.binary-name }} .
           echo "Built binary: ${{ inputs.binary-name }}"
           ls -la ${{ inputs.binary-name }}
 
       - name: Create release archive
         shell: bash
         run: |
-          tar -czvf ${{ inputs.binary-name }}-${{ inputs.release-tag }}-${{ inputs.goos }}-${{ inputs.goarch }}.tar.gz ${{ inputs.binary-name }}
-          sha256sum ${{ inputs.binary-name }}-${{ inputs.release-tag }}-${{ inputs.goos }}-${{ inputs.goarch }}.tar.gz > ${{ inputs.binary-name }}-${{ inputs.release-tag }}-${{ inputs.goos }}-${{ inputs.goarch }}.tar.gz.sha256
+          tar -czvf ${{ inputs.binary-name }}-${{ inputs.release-tag }}-linux-${{ inputs.goarch }}.tar.gz ${{ inputs.binary-name }}
+          sha256sum ${{ inputs.binary-name }}-${{ inputs.release-tag }}-linux-${{ inputs.goarch }}.tar.gz > ${{ inputs.binary-name }}-${{ inputs.release-tag }}-linux-${{ inputs.goarch }}.tar.gz.sha256
 
       - name: Upload to GitHub Release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ inputs.release-tag }}
           files: |
-            ${{ inputs.binary-name }}-${{ inputs.release-tag }}-${{ inputs.goos }}-${{ inputs.goarch }}.tar.gz
-            ${{ inputs.binary-name }}-${{ inputs.release-tag }}-${{ inputs.goos }}-${{ inputs.goarch }}.tar.gz.sha256
+            ${{ inputs.binary-name }}-${{ inputs.release-tag }}-linux-${{ inputs.goarch }}.tar.gz
+            ${{ inputs.binary-name }}-${{ inputs.release-tag }}-linux-${{ inputs.goarch }}.tar.gz.sha256
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -95,7 +90,7 @@ jobs:
           context: .
           file: ./Dockerfile
           push: true
-          platforms: ${{ inputs.goos }}/${{ inputs.goarch }}
+          platforms: linux/${{ inputs.goarch }}
           tags: |
             ${{ steps.tags.outputs.image }}:${{ inputs.release-tag }}
             ${{ steps.tags.outputs.image }}:latest
