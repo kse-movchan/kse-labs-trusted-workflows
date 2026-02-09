@@ -44,6 +44,11 @@ jobs:
         uses: actions/setup-go@v5
         with:
           go-version: ${{ inputs.go-version }}
+          cache: false
+
+      - name: Clean Go module cache
+        shell: bash
+        run: go clean -modcache
 
       - name: Build binary
         shell: bash
