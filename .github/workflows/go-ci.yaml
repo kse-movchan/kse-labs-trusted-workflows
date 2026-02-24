@@ -10,7 +10,23 @@ on:
         default: '1.21'
 
 jobs:
+  setup:
+    runs-on: self-hosted
+    outputs:
+      goarch: ${{ steps.detect.outputs.goarch }}
+    steps:
+      - name: Detect platform
+        id: detect
+        shell: pwsh
+        run: |
+          if ("${{ runner.os }}" -eq "macOS") {
+            echo "goarch=arm64" >> $env:GITHUB_OUTPUT
+          } else {
+            echo "goarch=amd64" >> $env:GITHUB_OUTPUT
+          }
+
   lint:
+    needs: setup
     name: Lint
     runs-on: self-hosted
     steps:
