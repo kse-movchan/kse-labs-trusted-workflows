@@ -23,19 +23,19 @@ jobs:
           cache: false
 
       - name: Clean Go module cache
-        shell: bash
+        shell: pwsh
         run: go clean -modcache
 
       - name: Download dependencies
-        shell: bash
+        shell: pwsh
         run: go mod download
 
       - name: Verify dependencies
-        shell: bash
+        shell: pwsh
         run: go mod verify
 
       - name: Run go vet
-        shell: bash
+        shell: pwsh
         run: go vet ./...
 
   build:
@@ -51,11 +51,11 @@ jobs:
           cache: false
 
       - name: Clean Go module cache
-        shell: bash
+        shell: pwsh
         run: go clean -modcache
 
       - name: Build
-        shell: bash
+        shell: pwsh
         run: go build -v ./...
 
   test:
@@ -71,9 +71,9 @@ jobs:
           cache: false
 
       - name: Clean Go module cache
-        shell: bash
+        shell: pwsh
         run: go clean -modcache
 
       - name: Run tests
-        shell: bash
+        shell: pwsh
         run: go test -v -race -count=1 ./...
