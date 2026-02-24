@@ -12,7 +12,7 @@ on:
 jobs:
   lint:
     name: Lint
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
@@ -23,24 +23,24 @@ jobs:
           cache: false
 
       - name: Clean Go module cache
-        shell: pwsh
+        shell: bash
         run: go clean -modcache
 
       - name: Download dependencies
-        shell: pwsh
+        shell: bash
         run: go mod download
 
       - name: Verify dependencies
-        shell: pwsh
+        shell: bash
         run: go mod verify
 
       - name: Run go vet
-        shell: pwsh
+        shell: bash
         run: go vet ./...
 
   build:
     name: Build
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
@@ -51,16 +51,16 @@ jobs:
           cache: false
 
       - name: Clean Go module cache
-        shell: pwsh
+        shell: bash
         run: go clean -modcache
 
       - name: Build
-        shell: pwsh
+        shell: bash
         run: go build -v ./...
 
   test:
     name: Test
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
@@ -71,9 +71,9 @@ jobs:
           cache: false
 
       - name: Clean Go module cache
-        shell: pwsh
+        shell: bash
         run: go clean -modcache
 
       - name: Run tests
-        shell: pwsh
+        shell: bash
         run: go test -v -race -count=1 ./...
