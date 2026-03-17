@@ -71,7 +71,7 @@ jobs:
           
           foreach ($tag in $TAG_ARRAY) {
               $cleanTag = $tag.Trim()
-              $FULL_TAGS_LIST += "$REGISTRY/$REPO/$IMAGE:$cleanTag"
+              $FULL_TAGS_LIST += "$REGISTRY/$REPO/${IMAGE}:$cleanTag"
           }
           
           $RESULT = $FULL_TAGS_LIST -join ','
