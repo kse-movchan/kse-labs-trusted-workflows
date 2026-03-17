@@ -60,6 +60,7 @@ jobs:
 
       - name: Generate image metadata
         id: meta
+        shell: bash
         run: |
           REGISTRY="${{ inputs.registry }}"
           REPO="${{ github.repository_owner }}"
