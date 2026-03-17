@@ -60,26 +60,23 @@ jobs:
 
       - name: Generate image metadata
         id: meta
-        shell: bash
         run: |
-          REGISTRY="${{ inputs.registry }}"
-          REPO="${{ github.repository_owner }}"
-          IMAGE="${{ inputs.image-name }}"
-          TAGS="${{ inputs.tags }}"
-
-          # Build full image references
-          FULL_TAGS=""
-          IFS=',' read -ra TAG_ARRAY <<< "$TAGS"
-          for tag in "${TAG_ARRAY[@]}"; do
-            tag=$(echo "$tag" | xargs)  # trim whitespace
-            if [ -n "$FULL_TAGS" ]; then
-              FULL_TAGS="$FULL_TAGS,"
-            fi
-            FULL_TAGS="$FULL_TAGS$REGISTRY/$REPO/$IMAGE:$tag"
-          done
-
-          echo "tags=$FULL_TAGS" >> "$GITHUB_OUTPUT"
-          echo "Generated tags: $FULL_TAGS"
+          $REGISTRY = "${{ inputs.registry }}"
+          $REPO = "${{ github.repository_owner }}"
+          $IMAGE = "${{ inputs.image-name }}"
+          $TAGS_STR = "${{ inputs.tags }}"
+          
+          $TAG_ARRAY = $TAGS_STR -split ','
+          $FULL_TAGS_LIST = @()
+          
+          foreach ($tag in $TAG_ARRAY) {
+              $cleanTag = $tag.Trim()
+              $FULL_TAGS_LIST += "$REGISTRY/$REPO/$IMAGE:$cleanTag"
+          }
+          
+          $RESULT = $FULL_TAGS_LIST -join ','
+          echo "tags=$RESULT" >> $env:GITHUB_OUTPUT
+          echo "Generated tags: $RESULT"
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
